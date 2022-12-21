@@ -31,7 +31,8 @@ public class UserService {
         // 있으면 에러처리
         userRepository.findByUserName(request.getUserName())
                 .ifPresent(user ->{
-                    throw new HospitalReviewAppException(ErrorCode.DUPLICATED_USER_NAME, String.format("UserName:%s", request.getUserName()));
+                    throw new HospitalReviewAppException(ErrorCode.DUPLICATED_USER_NAME,
+                            String.format("DUPLICATED_USER_NAME UserName:%s", request.getUserName()));
                 });
 
         // 회원가입 .save()
