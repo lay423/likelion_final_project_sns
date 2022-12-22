@@ -15,12 +15,12 @@ public class PostController {
 
     private final PostService postService;
 
-    @PostMapping("/posts")
+    @PostMapping()
     public Response<PostRegisterResponse> post(@RequestBody PostRegisterRequest request) {
         return Response.success(postService.post(request));
     }
 
-    @GetMapping("/posts/{postsId}")
+    @GetMapping("/{postsId}")
     public Response<PostInquireResponse> findById(@PathVariable long postsId) {
         return Response.success(postService.findById(postsId));
     }
