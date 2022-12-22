@@ -46,8 +46,8 @@ class UserControllerTest {
     @DisplayName("회원가입 성공")
     @WithMockUser
     void join_success() throws Exception {
-        UserJoinRequest userJoinRequest = UserJoinRequest.builder()
-                .userName("kyeongrok")
+        UserJoinRequest userJoinRequest1 = UserJoinRequest.builder()
+                .userName("junha")
                 .password("1q2w3e4r")
                 .email("oceanfog1@gmail.com")
                 .build();
@@ -106,7 +106,7 @@ class UserControllerTest {
     void login_success() throws Exception {
         UserJoinRequest userJoinRequest = UserJoinRequest.builder()
                 .userName("kyeongrok")
-                .password("1q2w3e4r")
+                .password("1234")
                 .email("oceanfog1@gmail.com")
                 .build();
 
