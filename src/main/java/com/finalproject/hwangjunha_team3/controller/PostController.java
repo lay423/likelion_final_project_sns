@@ -24,4 +24,9 @@ public class PostController {
     public Response<PostInquireResponse> findById(@PathVariable long postsId) {
         return Response.success(postService.findById(postsId));
     }
+
+    @GetMapping()
+    public String test(){
+        return "test";
+    }
 }
