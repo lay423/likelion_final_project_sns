@@ -1,24 +1,37 @@
 package com.finalproject.hwangjunha_team3.service;
 
 import com.finalproject.hwangjunha_team3.domain.Post;
+import com.finalproject.hwangjunha_team3.domain.User;
+import com.finalproject.hwangjunha_team3.domain.dto.PostDto;
 import com.finalproject.hwangjunha_team3.domain.dto.PostInquireResponse;
 import com.finalproject.hwangjunha_team3.domain.dto.PostRegisterRequest;
 import com.finalproject.hwangjunha_team3.domain.dto.PostRegisterResponse;
+import com.finalproject.hwangjunha_team3.exceptionManager.ErrorCode;
+import com.finalproject.hwangjunha_team3.exceptionManager.HospitalReviewAppException;
 import com.finalproject.hwangjunha_team3.repository.PostRepository;
+import com.finalproject.hwangjunha_team3.repository.UserRepository;
+import com.finalproject.hwangjunha_team3.utils.JwtTokenUtil;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 
+
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class PostService {
     private final PostRepository postRepository;
+    private final UserRepository userRepository;
 
-    public PostRegisterResponse post (PostRegisterRequest request){
-        //final String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+    @Value("${jwt.token.secret}")
+    private String secretKey;
+
+    public PostDto post (PostRegisterRequest request){
 
         Post post = postRepository.save(Post.builder()
                 .title(request.getTitle())
@@ -26,7 +39,10 @@ public class PostService {
                 .createAt(LocalDateTime.now())
                 .lastModifiedAt(LocalDateTime.now())
                 .build());
-        return new PostRegisterResponse("포스트 등록 완료", post.getId());
+        PostDto postDto = PostDto.builder()
+                .id(post.getId())
+                .build();
+        return postDto;
     }
 
     public PostInquireResponse findById(long postsId) {
