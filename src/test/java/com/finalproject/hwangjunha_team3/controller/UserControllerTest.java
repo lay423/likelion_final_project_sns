@@ -1,8 +1,10 @@
 package com.finalproject.hwangjunha_team3.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.finalproject.hwangjunha_team3.domain.User;
 import com.finalproject.hwangjunha_team3.domain.dto.UserDto;
 import com.finalproject.hwangjunha_team3.domain.dto.UserJoinRequest;
+import com.finalproject.hwangjunha_team3.domain.dto.UserLoginRequest;
 import com.finalproject.hwangjunha_team3.exceptionManager.ErrorCode;
 import com.finalproject.hwangjunha_team3.exceptionManager.HospitalReviewAppException;
 import com.finalproject.hwangjunha_team3.service.UserService;
@@ -20,8 +22,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(UserController.class)
@@ -61,10 +64,9 @@ class UserControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk());
     }
-
     @Test
     @WithMockUser
-    @DisplayName("회원가입 실패")
+    @DisplayName("회원가입 실패 - username 중복")
     void join_fail() throws Exception {
 
 
@@ -78,52 +80,70 @@ class UserControllerTest {
                 .andExpect(status().isConflict());
     }
 
-    @Test
-    @DisplayName("로그인 실패 - id 없음")
-    @WithMockUser
-    void login_fail1() throws Exception {
-        String id = "junha";
-        String password = "1234";
-        when(userService.login(any(), any())).thenThrow(new HospitalReviewAppException(ErrorCode.NOT_FOUND, ""));
-
-        mockMvc.perform(post("/api/v1/users/join")
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsBytes(userJoinRequest)))
-                .andDo(print())
-                .andExpect(status().isNotFound());
-    }
-
-    @Test
-    @DisplayName("로그인 실패 - password 잘못 입력")
-    @WithMockUser
-    void login_fail2() throws Exception {
-    }
-
+    //로그인 성공했을 때 테스트
     @Test
     @DisplayName("로그인 성공")
     @WithMockUser
     void login_success() throws Exception {
-        UserJoinRequest userJoinRequest = UserJoinRequest.builder()
-                .userName("kyeongrok")
-                .password("1234")
-                .email("oceanfog1@gmail.com")
+        UserLoginRequest userLoginRequest = UserLoginRequest.builder()
+                .userName("user")
+                .password("password")
                 .build();
 
-
-//        when(userService.join(any())).thenReturn(mock(UserDto.class));
-//        mockMvc.perform(post("/api/v1/users/join")
-//                        .with(csrf())
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .content(objectMapper.writeValueAsBytes(userJoinRequest)))
-//                .andDo(print())
-//                .andExpect(status().isOk());
+        when(userService.login(any(), any()))
+                .thenReturn("token");
 
         mockMvc.perform(post("/api/v1/users/login")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsBytes(userJoinRequest)))
+                        .content(objectMapper.writeValueAsBytes(userLoginRequest)))
                 .andDo(print())
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.resultCode").exists())
+                .andExpect(jsonPath("$.result.token").exists())
+        ;
     }
+
+    //userName이 존재하지 않을 때 테스트
+    @Test
+    @DisplayName("로그인 실패 - username 없음")
+    @WithMockUser
+    void login_fail1() throws Exception {
+        UserLoginRequest userLoginRequest = UserLoginRequest.builder()
+                .userName("user")
+                .password("password")
+                .build();
+
+        when(userService.login(any(), any()))
+                .thenThrow(new HospitalReviewAppException(ErrorCode.USERNAME_NOT_FOUND, ""));
+
+        mockMvc.perform(post("/api/v1/users/login")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsBytes(userLoginRequest)))
+                .andDo(print())
+                .andExpect(status().is(ErrorCode.USERNAME_NOT_FOUND.getStatus().value()));
+    }
+
+    //password틀렸을 때 테스트
+    @Test
+    @DisplayName("로그인 실패 - password틀림")
+    @WithMockUser
+    void login_fail2() throws Exception {
+        UserLoginRequest userLoginRequest = UserLoginRequest.builder()
+                .userName("user")
+                .password("password")
+                .build();
+
+        when(userService.login(any(), any()))
+                .thenThrow(new HospitalReviewAppException(ErrorCode.INVALID_PASSWORD, ""));
+
+        mockMvc.perform(post("/api/v1/users/login")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsBytes(userLoginRequest)))
+                .andDo(print())
+                .andExpect(status().is(ErrorCode.INVALID_PASSWORD.getStatus().value()));
+    }
+
 }
