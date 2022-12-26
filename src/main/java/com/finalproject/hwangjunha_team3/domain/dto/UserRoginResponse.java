@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Getter
 public class UserRoginResponse {
-    private String token;
+    private String jwt;
 
 
 }

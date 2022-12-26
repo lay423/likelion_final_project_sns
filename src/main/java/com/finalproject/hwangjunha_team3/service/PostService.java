@@ -15,6 +15,8 @@ import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 
@@ -36,8 +38,6 @@ public class PostService {
         Post post = postRepository.save(Post.builder()
                 .title(request.getTitle())
                 .body(request.getBody())
-                .createAt(LocalDateTime.now())
-                .lastModifiedAt(LocalDateTime.now())
                 .build());
         PostDto postDto = PostDto.builder()
                 .id(post.getId())
@@ -52,9 +52,15 @@ public class PostService {
                 .id(post.getId())
                 .body(post.getBody())
                 .title(post.getTitle())
-                .userName(post.getUserName())
+                .userName(post.getUser().getUserName())
                 .lastModifiedAt(post.getLastModifiedAt())
-                .createAt(post.getCreateAt())
+                .createAt(post.getCreatedAt())
                 .build();
+    }
+
+    public Page<PostDto> getAllPosts(Pageable pageable) {
+        Page<Post> posts = postRepository.findAll(pageable);
+        Page<PostDto> postDtos = PostDto.toDtoList(posts);
+        return postDtos;
     }
 }

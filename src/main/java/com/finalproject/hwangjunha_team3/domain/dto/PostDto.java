@@ -1,5 +1,6 @@
 package com.finalproject.hwangjunha_team3.domain.dto;
 
+import com.finalproject.hwangjunha_team3.domain.Post;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -30,15 +31,15 @@ public class PostDto {
 //                .build();
 //    }
 //
-//    /* Page<Entity> -> Page<Dto> 변환처리 */
-//    public static Page<PostDto> toDtoList(Page<PostEntity> postEntities){
-//        Page<PostDto> postDtoList = postEntities.map(m -> PostDto.builder()
-//                .id(m.getId())
-//                .title(m.getTitle())
-//                .body(m.getBody())
-//                .userName(m.getUser().getUserName())
-//                .createdAt(m.getCreatedAt())
-//                .build());
-//        return postDtoList;
-//    }
+
+    public static Page<PostDto> toDtoList(Page<Post> postEntities){
+        Page<PostDto> postDtoList = postEntities.map(m -> PostDto.builder()
+                .id(m.getId())
+                .title(m.getTitle())
+                .body(m.getBody())
+                .userName(m.getUser().getUserName())
+                .createdAt(m.getCreatedAt())
+                .build());
+        return postDtoList;
+    }
 }
