@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Getter
 @Builder
-public class PostRegisterResponse {
-    private String message;
-    private Integer postId;
+public class ModifyRequest {
+    private String title;
+    private String body;
 }

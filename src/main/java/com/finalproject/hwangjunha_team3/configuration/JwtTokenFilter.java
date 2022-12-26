@@ -1,5 +1,7 @@
 package com.finalproject.hwangjunha_team3.configuration;
 
+import com.finalproject.hwangjunha_team3.domain.User;
+import com.finalproject.hwangjunha_team3.domain.UserJwtDto;
 import com.finalproject.hwangjunha_team3.service.UserService;
 import com.finalproject.hwangjunha_team3.utils.JwtTokenUtil;
 import lombok.RequiredArgsConstructor;
@@ -21,41 +23,47 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class JwtTokenFilter extends OncePerRequestFilter {
+//    private UserDetailsService userDetailsService;
 
     private final UserService userService;
+
     private final String secretKey;
-
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-
-        final String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-        log.info("authorizationHeader:{}", authorizationHeader);
-
-        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-
-        // token분리
-        String token;
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    FilterChain chain)
+            throws ServletException, IOException {
+        final String header = request.getHeader(HttpHeaders.AUTHORIZATION);
+        final String token;
         try {
-            token = authorizationHeader.split(" ")[1];
-        } catch (Exception e) {
-            log.error("token 추출에 실패 했습니다.");
-            filterChain.doFilter(request, response);
+            if (header == null || !header.startsWith("Bearer ")) {
+//                log.error("Authorization Header does not start with Bearer {}", request.getRequestURI());
+                chain.doFilter(request, response);
+                return;
+            } else {
+                token = header.split(" ")[1].trim();
+                System.out.println(token);
+            }
+
+            String userName = JwtTokenUtil.getUsername(token, secretKey);
+            UserJwtDto userDetails = userService.loadUserByUsername(userName);
+
+            if (!JwtTokenUtil.validate(token, userDetails.getUsername(), secretKey)) {
+                chain.doFilter(request, response);
+                return;
+            }
+            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                    userDetails, null,
+                    userDetails.getAuthorities()
+            );
+            authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+        } catch (RuntimeException e) {
+            chain.doFilter(request, response);
             return;
         }
 
-        // Token이 만료 되었는지 Check
-        if(JwtTokenUtil.isExpired(token, secretKey)){
-            filterChain.doFilter(request, response);
-            return;
-        };
+        chain.doFilter(request, response);
 
-        //문 열어주기
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken("", null, List.of(new SimpleGrantedAuthority("USER"))    );
-        authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-        SecurityContextHolder.getContext().setAuthentication(authenticationToken); // 권한 부여
-        filterChain.doFilter(request, response);
     }
 }

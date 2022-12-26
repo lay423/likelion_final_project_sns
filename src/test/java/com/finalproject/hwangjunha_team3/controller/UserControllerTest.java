@@ -100,7 +100,7 @@ class UserControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.resultCode").exists())
-                .andExpect(jsonPath("$.result.token").exists())
+                .andExpect(jsonPath("$.result.jwt").exists())
         ;
     }
 

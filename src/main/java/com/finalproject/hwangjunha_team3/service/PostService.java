@@ -20,6 +20,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
+import java.util.Objects;
 import java.time.LocalDateTime;
 
 
@@ -33,11 +35,14 @@ public class PostService {
     @Value("${jwt.token.secret}")
     private String secretKey;
 
-    public PostDto post (PostRegisterRequest request){
+    public PostDto post (PostRegisterRequest request, String username){
+        User userEntity = userRepository.findByUserName(username)
+                .orElseThrow(() -> new HospitalReviewAppException(ErrorCode.USERNAME_NOT_FOUND, String.format("%s not founded", username)));
 
         Post post = postRepository.save(Post.builder()
                 .title(request.getTitle())
                 .body(request.getBody())
+                .user(userEntity)
                 .build());
         PostDto postDto = PostDto.builder()
                 .id(post.getId())
@@ -45,16 +50,17 @@ public class PostService {
         return postDto;
     }
 
-    public PostInquireResponse findById(long postsId) {
-        Post post = postRepository.findById(postsId).orElseThrow(IllegalArgumentException::new);
 
-        return PostInquireResponse.builder()
+    public PostDto findById(Integer postsId) {
+        Post post = postRepository.findById(postsId)
+                .orElseThrow(() -> new HospitalReviewAppException(ErrorCode.POST_NOT_FOUND, String.format("%d의 포스트가 없습니다.", postsId)));
+
+        return PostDto.builder()
                 .id(post.getId())
                 .body(post.getBody())
                 .title(post.getTitle())
                 .userName(post.getUser().getUserName())
-                .lastModifiedAt(post.getLastModifiedAt())
-                .createAt(post.getCreatedAt())
+                .createdAt(post.getCreatedAt())
                 .build();
     }
 
@@ -62,5 +68,35 @@ public class PostService {
         Page<Post> posts = postRepository.findAll(pageable);
         Page<PostDto> postDtos = PostDto.toDtoList(posts);
         return postDtos;
+    }
+
+    @Transactional
+    public boolean delete(String name, Integer postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new HospitalReviewAppException(ErrorCode.POST_NOT_FOUND, String.format("postId is %d", postId)));
+        User userEntity = userRepository.findByUserName(name)
+                .orElseThrow(() -> new HospitalReviewAppException(ErrorCode.USERNAME_NOT_FOUND, String.format("%s not founded", name)));
+
+        if (!Objects.equals(post.getUser().getUserName(), name)) {
+            throw new HospitalReviewAppException(ErrorCode.INVALID_PERMISSION, String.format("user %s has no permission with post %d", name, postId));
+        }
+        postRepository.delete(post);
+        return true;
+    }
+
+
+    public Post modify(String name, Integer id, String title, String body) {
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new HospitalReviewAppException(ErrorCode.POST_NOT_FOUND, String.format("postId is %d", id)));
+        User user = userRepository.findByUserName(name)
+                .orElseThrow(() -> new HospitalReviewAppException(ErrorCode.USERNAME_NOT_FOUND, String.format("%s not founded", name)));
+
+        Integer userId = user.getId();
+        if (!Objects.equals(post.getUser().getId(), userId)) {
+            throw new HospitalReviewAppException(ErrorCode.INVALID_PERMISSION, String.format("user %s has no permission with post %d", userId, id));
+        }
+        post.setTitle(title);
+        post.setBody(body);
+        return postRepository.saveAndFlush(post);
     }
 }

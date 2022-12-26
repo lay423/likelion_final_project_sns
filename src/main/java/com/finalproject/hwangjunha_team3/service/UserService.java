@@ -1,6 +1,7 @@
 package com.finalproject.hwangjunha_team3.service;
 
 import com.finalproject.hwangjunha_team3.domain.User;
+import com.finalproject.hwangjunha_team3.domain.UserJwtDto;
 import com.finalproject.hwangjunha_team3.domain.dto.UserDto;
 import com.finalproject.hwangjunha_team3.domain.dto.UserJoinRequest;
 import com.finalproject.hwangjunha_team3.exceptionManager.ErrorCode;
@@ -9,6 +10,7 @@ import com.finalproject.hwangjunha_team3.repository.UserRepository;
 import com.finalproject.hwangjunha_team3.utils.JwtTokenUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +24,7 @@ public class UserService {
     @Value("${jwt.token.secret}")
     private String secretKey;
 
-    private final long expiredTimeMs = 1000L * 60 * 60;
+    private final long expiredTimeMs = 1000L * 60 * 60l;
 
     public UserDto join(UserJoinRequest request) {
         // 비즈니스 로직 - 회원 가입
@@ -49,7 +51,7 @@ public class UserService {
         //userName 있는지 여부 확인
         //없으면 NOT_FOUND 에러 발생
         User user = userRepository.findByUserName(userName)
-                .orElseThrow(() -> new HospitalReviewAppException(ErrorCode.NOT_FOUND, String.format("%s는 가입된 적이 없습니다.", userName)));
+                .orElseThrow(() -> new HospitalReviewAppException(ErrorCode.USERNAME_NOT_FOUND, String.format("%s는 가입된 적이 없습니다.", userName)));
 
         //password 일치 하는지 여부 확인
         if(!encoder.matches(password, user.getPassword()))
@@ -60,6 +62,13 @@ public class UserService {
 
     public User getUserByUserName(String userName) {
         return userRepository.findByUserName(userName)
-                .orElseThrow(() -> new HospitalReviewAppException(ErrorCode.NOT_FOUND, ""));
+                .orElseThrow(() -> new HospitalReviewAppException(ErrorCode.USERNAME_NOT_FOUND, ""));
+    }
+
+    public UserJwtDto loadUserByUsername(String userName) throws UsernameNotFoundException {
+        User userEntity = userRepository.findByUserName(userName)
+                .orElseThrow(()->new HospitalReviewAppException(ErrorCode.USERNAME_NOT_FOUND,userName+ "이 없습니다." ));
+        UserJwtDto user = UserJwtDto.fromEntity(userEntity);
+        return user;
     }
 }

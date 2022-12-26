@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.sql.Timestamp;
+import java.time.Instant;
 
 @Entity
 @AllArgsConstructor
@@ -15,7 +17,8 @@ import javax.persistence.*;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "user_id")
+    private Integer id = null;
 
     @Column(unique = true)
     private String userName;
@@ -24,4 +27,19 @@ public class User {
 
     @Enumerated(EnumType.STRING)
     private UserRole role;
+
+    private Timestamp registeredAt;
+
+    private Timestamp updatedAt;
+
+    private Timestamp removedAt;
+
+
+    void registeredAt() {
+        this.registeredAt = Timestamp.from(Instant.now());
+    }
+
+    void updatedAt() {
+        this.updatedAt = Timestamp.from(Instant.now());
+    }
 }

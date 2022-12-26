@@ -21,13 +21,6 @@ import java.util.List;
 @EnableSwagger2
 public class SwaggerConfiguration {
 
-    private ApiInfo apiInfo(){
-        return new ApiInfoBuilder()
-                .title("Demo")
-                .description("API EXAMPLE")
-                .build();
-    }
-
     @Bean
     public Docket api() {
         return new Docket(DocumentationType.OAS_30)
