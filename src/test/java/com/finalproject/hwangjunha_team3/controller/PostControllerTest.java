@@ -55,9 +55,9 @@ class PostControllerTest {
 
         PostDto postEntity = PostDto.builder()
                 .id(1)
-                .title("This is a post.")
-                .body("This is the body.")
-                .userName("kyeongrok")
+                .title("TITLE")
+                .body("BODY")
+                .userName("junha")
                 .createdAt(LocalDateTime.now())
                 .build();
 
@@ -103,8 +103,8 @@ class PostControllerTest {
     void post_success() throws Exception {
 
         PostRegisterRequest postRequest = PostRegisterRequest.builder()
-                .title("title_post")
-                .body("body_post")
+                .title("TITLE")
+                .body("BODY")
                 .build();
 
         when(postService.post(any(), any()))
@@ -129,8 +129,8 @@ class PostControllerTest {
     void post_fail1() throws Exception {
 
         PostRegisterRequest postRequest = PostRegisterRequest.builder()
-                .title("title_post")
-                .body("body_post")
+                .title("TITLE")
+                .body("BODY")
                 .build();
 
         when(postService.post(any(), any()))
@@ -224,8 +224,8 @@ class PostControllerTest {
     void modify_success() throws Exception {
 
         ModifyRequest modifyRequest = ModifyRequest.builder()
-                .title("title_modify")
-                .body("body_modify")
+                .title("TITLE_MODIFY")
+                .body("BODY_MODIFY")
                 .build();
 
         Post postEntity = Post.builder()
@@ -251,8 +251,8 @@ class PostControllerTest {
     void modify_fail1() throws Exception {
 
         ModifyRequest modifyRequest = ModifyRequest.builder()
-                .title("title_modify")
-                .body("body_modify")
+                .title("TITLE_MODIFY")
+                .body("BODY_MODIFY")
                 .build();
 
         when(postService.modify(any(), any(), any(), any()))
@@ -272,8 +272,8 @@ class PostControllerTest {
     void modify_fail2() throws Exception {
 
         ModifyRequest modifyRequest = ModifyRequest.builder()
-                .title("title_modify")
-                .body("body_modify")
+                .title("TITLE_MODIFY")
+                .body("BODY_MODIFY")
                 .build();
 
         when(postService.modify(any(), any(), any(), any()))
@@ -293,8 +293,8 @@ class PostControllerTest {
     void modify_fail3() throws Exception {
 
         ModifyRequest modifyRequest = ModifyRequest.builder()
-                .title("title_modify")
-                .body("body_modify")
+                .title("TITLE_MODIFY")
+                .body("BODY_MODIFY")
                 .build();
 
         when(postService.modify(any(), any(), any(), any()))
@@ -314,8 +314,8 @@ class PostControllerTest {
     void modify_fail4() throws Exception {
 
         ModifyRequest modifyRequest = ModifyRequest.builder()
-                .title("title_modify")
-                .body("body_modify")
+                .title("TITLE_MODIFY")
+                .body("BODY_MODIFY")
                 .build();
 
         when(postService.modify(any(), any(), any(), any()))

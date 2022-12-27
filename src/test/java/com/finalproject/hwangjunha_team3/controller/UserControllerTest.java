@@ -52,7 +52,7 @@ class UserControllerTest {
         UserJoinRequest userJoinRequest1 = UserJoinRequest.builder()
                 .userName("junha")
                 .password("1q2w3e4r")
-                .email("oceanfog1@gmail.com")
+                .email("junha@gmail.com")
                 .build();
 
 
