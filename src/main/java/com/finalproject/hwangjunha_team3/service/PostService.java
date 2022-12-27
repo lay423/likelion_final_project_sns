@@ -3,26 +3,20 @@ package com.finalproject.hwangjunha_team3.service;
 import com.finalproject.hwangjunha_team3.domain.Post;
 import com.finalproject.hwangjunha_team3.domain.User;
 import com.finalproject.hwangjunha_team3.domain.dto.PostDto;
-import com.finalproject.hwangjunha_team3.domain.dto.PostInquireResponse;
 import com.finalproject.hwangjunha_team3.domain.dto.PostRegisterRequest;
-import com.finalproject.hwangjunha_team3.domain.dto.PostRegisterResponse;
 import com.finalproject.hwangjunha_team3.exceptionManager.ErrorCode;
 import com.finalproject.hwangjunha_team3.exceptionManager.HospitalReviewAppException;
 import com.finalproject.hwangjunha_team3.repository.PostRepository;
 import com.finalproject.hwangjunha_team3.repository.UserRepository;
-import com.finalproject.hwangjunha_team3.utils.JwtTokenUtil;
-import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.Objects;
-import java.time.LocalDateTime;
 
 
 @Service
@@ -45,7 +39,7 @@ public class PostService {
                 .user(userEntity)
                 .build());
         PostDto postDto = PostDto.builder()
-                .id(post.getId())
+                .postId(post.getId())
                 .build();
         return postDto;
     }
@@ -56,7 +50,7 @@ public class PostService {
                 .orElseThrow(() -> new HospitalReviewAppException(ErrorCode.POST_NOT_FOUND, String.format("%d의 포스트가 없습니다.", postsId)));
 
         return PostDto.builder()
-                .id(post.getId())
+                .postId(post.getId())
                 .body(post.getBody())
                 .title(post.getTitle())
                 .userName(post.getUser().getUserName())

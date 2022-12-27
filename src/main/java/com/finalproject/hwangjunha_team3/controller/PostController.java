@@ -29,7 +29,7 @@ public class PostController {
     public Response<PostRegisterResponse> post(@RequestBody PostRegisterRequest request, Authentication authentication) {
         log.info("username:{}", authentication.getName());
         PostDto postDto = postService.post(request, authentication.getName());
-        return Response.success(new PostRegisterResponse("포스트 등록 완료", postDto.getId()));
+        return Response.success(new PostRegisterResponse("포스트 등록 완료", postDto.getPostId()));
     }
 
     @GetMapping("/{postsId}")

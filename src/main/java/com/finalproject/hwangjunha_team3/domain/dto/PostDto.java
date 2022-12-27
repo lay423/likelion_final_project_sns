@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @Getter
 public class PostDto {
 
-    private Integer id;
+    private Integer postId;
     private String title;
     private String body;
     private String userName;
@@ -34,7 +34,7 @@ public class PostDto {
 
     public static Page<PostDto> toDtoList(Page<Post> postEntities){
         Page<PostDto> postDtoList = postEntities.map(m -> PostDto.builder()
-                .id(m.getId())
+                .postId(m.getId())
                 .title(m.getTitle())
                 .body(m.getBody())
                 .userName(m.getUser().getUserName())

@@ -6,7 +6,6 @@ import com.finalproject.hwangjunha_team3.domain.Post;
 import com.finalproject.hwangjunha_team3.domain.dto.ModifyRequest;
 import com.finalproject.hwangjunha_team3.domain.dto.PostDto;
 import com.finalproject.hwangjunha_team3.domain.dto.PostRegisterRequest;
-import com.finalproject.hwangjunha_team3.domain.dto.PostRegisterResponse;
 import com.finalproject.hwangjunha_team3.exceptionManager.ErrorCode;
 import com.finalproject.hwangjunha_team3.exceptionManager.HospitalReviewAppException;
 import com.finalproject.hwangjunha_team3.service.PostService;
@@ -55,7 +54,7 @@ class PostControllerTest {
     void post_read_success() throws Exception {
 
         PostDto postEntity = PostDto.builder()
-                .id(1)
+                .postId(1)
                 .title("This is a post.")
                 .body("This is the body.")
                 .userName("kyeongrok")
@@ -110,7 +109,7 @@ class PostControllerTest {
 
         when(postService.post(any(), any()))
                 .thenReturn(PostDto.builder()
-                        .id(0)
+                        .postId(0)
                         .build());
 
         mockMvc.perform(post("/api/v1/posts")
