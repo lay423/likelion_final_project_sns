@@ -68,11 +68,11 @@ class PostControllerTest {
                         .with(csrf()))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").exists())
-                .andExpect(jsonPath("$.title").exists())
-                .andExpect(jsonPath("$.userName").exists())
-                .andExpect(jsonPath("$.createdAt").exists())
-                .andExpect(jsonPath("$.body").exists());
+                .andExpect(jsonPath("$.result.id").exists())
+                .andExpect(jsonPath("$.result.title").exists())
+                .andExpect(jsonPath("$.result.userName").exists())
+                .andExpect(jsonPath("$.result.createdAt").exists())
+                .andExpect(jsonPath("$.result.body").exists());
     }
 
 

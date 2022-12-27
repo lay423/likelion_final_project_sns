@@ -33,8 +33,8 @@ public class PostController {
     }
 
     @GetMapping("/{postsId}")
-    public ResponseEntity<PostDto> findById(@PathVariable Integer postsId) {
-        return ResponseEntity.ok().body(postService.findById(postsId));
+    public Response<PostDto> findById(@PathVariable Integer postsId) {
+        return Response.success(postService.findById(postsId));
     }
 
     @GetMapping
