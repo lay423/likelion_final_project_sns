@@ -54,7 +54,7 @@ class PostControllerTest {
     void post_read_success() throws Exception {
 
         PostDto postEntity = PostDto.builder()
-                .postId(1)
+                .id(1)
                 .title("This is a post.")
                 .body("This is the body.")
                 .userName("kyeongrok")
@@ -109,7 +109,7 @@ class PostControllerTest {
 
         when(postService.post(any(), any()))
                 .thenReturn(PostDto.builder()
-                        .postId(0)
+                        .id(0)
                         .build());
 
         mockMvc.perform(post("/api/v1/posts")

@@ -39,7 +39,7 @@ public class PostService {
                 .user(userEntity)
                 .build());
         PostDto postDto = PostDto.builder()
-                .postId(post.getId())
+                .id(post.getId())
                 .build();
         return postDto;
     }
@@ -50,7 +50,7 @@ public class PostService {
                 .orElseThrow(() -> new HospitalReviewAppException(ErrorCode.POST_NOT_FOUND, String.format("%d의 포스트가 없습니다.", postsId)));
 
         return PostDto.builder()
-                .postId(post.getId())
+                .id(post.getId())
                 .body(post.getBody())
                 .title(post.getTitle())
                 .userName(post.getUser().getUserName())
