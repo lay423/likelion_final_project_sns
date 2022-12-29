@@ -7,6 +7,7 @@ import com.finalproject.hwangjunha_team3.domain.dto.UserJoinRequest;
 import com.finalproject.hwangjunha_team3.domain.dto.UserLoginRequest;
 import com.finalproject.hwangjunha_team3.exceptionManager.ErrorCode;
 import com.finalproject.hwangjunha_team3.exceptionManager.HospitalReviewAppException;
+import com.finalproject.hwangjunha_team3.service.AlgorithmService;
 import com.finalproject.hwangjunha_team3.service.UserService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -32,7 +33,11 @@ class HelloControllerTest {
     @Autowired
     MockMvc mockMvc;
 
+    @MockBean
+    AlgorithmService algorithmService;
+
     @Test
+    @WithMockUser
     @DisplayName("hello 이름이 잘 나오는지 테스트")
     void hello() throws Exception {
         mockMvc.perform(get("/api/v1/hello")
@@ -40,5 +45,19 @@ class HelloControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().string("황준하"));
+    }
+
+    @Test
+    @WithMockUser
+    @DisplayName("자릿수 합")
+    void sumOfDigit() throws Exception {
+        when(algorithmService.sumOfDigit(687))
+                .thenReturn(String.valueOf(22));
+
+        mockMvc.perform(get("/api/v1/hello/687")
+                        .with(csrf()))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().string("22"));
     }
 }
