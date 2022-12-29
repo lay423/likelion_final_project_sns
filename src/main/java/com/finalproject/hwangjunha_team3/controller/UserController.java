@@ -13,11 +13,6 @@ public class UserController {
 
     private final UserService userService;
 
-    @GetMapping("/test")
-    public String test() {
-        return "테스트";
-    }
-
     @PostMapping("/join")
     public Response<UserJoinResponse> join(@RequestBody UserJoinRequest userJoinRequest) {
         UserDto userDto = userService.join(userJoinRequest);
