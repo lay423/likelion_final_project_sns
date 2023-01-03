@@ -22,6 +22,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
 
+import static java.time.LocalDateTime.now;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -57,7 +58,7 @@ class PostControllerTest {
                 .title("TITLE")
                 .body("BODY")
                 .userName("junha")
-                .createdAt(LocalDateTime.now())
+                .createdAt(now())
                 .build();
 
         when(postService.findById(any()))
@@ -336,9 +337,13 @@ class PostControllerTest {
                 .comment("comment test")
                 .build();
 
-        when(postService.comment(any()))
+        when(postService.comment(any(), any(), any()))
                 .thenReturn(CommentResponse.builder()
                         .id(0)
+                        .comment("comment test")
+                        .userName("junha")
+                        .postId(0)
+                        .createdAt(now())
                         .build());
 
         mockMvc.perform(post("/api/v1/posts/1/comments")
@@ -362,7 +367,7 @@ class PostControllerTest {
                 .comment("comment test")
                 .build();
 
-        when(postService.comment(any()))
+        when(postService.comment(any(), any(), any()))
                 .thenThrow(new HospitalReviewAppException(ErrorCode.INVALID_PERMISSION, ""));
 
         mockMvc.perform(post("/api/v1/posts/1/comments")
@@ -382,7 +387,7 @@ class PostControllerTest {
                 .comment("comment test")
                 .build();
 
-        when(postService.comment(any()))
+        when(postService.comment(any(), any(), any()))
                 .thenThrow(new HospitalReviewAppException(ErrorCode.POST_NOT_FOUND, ""));
 
         mockMvc.perform(post("/api/v1/posts/1/comments")
