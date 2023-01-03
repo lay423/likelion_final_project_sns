@@ -15,7 +15,8 @@ import java.time.LocalDateTime;
 public class Post extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    @Column(name = "post_id")
+    private Integer id=null;
     private String title;
     private String body;
 

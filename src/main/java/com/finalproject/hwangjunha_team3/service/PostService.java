@@ -1,10 +1,12 @@
 package com.finalproject.hwangjunha_team3.service;
 
+import com.finalproject.hwangjunha_team3.domain.Comment;
 import com.finalproject.hwangjunha_team3.domain.Post;
 import com.finalproject.hwangjunha_team3.domain.User;
 import com.finalproject.hwangjunha_team3.domain.dto.*;
 import com.finalproject.hwangjunha_team3.exceptionManager.ErrorCode;
 import com.finalproject.hwangjunha_team3.exceptionManager.HospitalReviewAppException;
+import com.finalproject.hwangjunha_team3.repository.CommentRepository;
 import com.finalproject.hwangjunha_team3.repository.PostRepository;
 import com.finalproject.hwangjunha_team3.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -24,11 +26,12 @@ import java.util.Objects;
 public class PostService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
+    private final CommentRepository commentRepository;
 
     @Value("${jwt.token.secret}")
     private String secretKey;
 
-    public PostDto post (PostRegisterRequest request, String username){
+    public PostDto post(PostRegisterRequest request, String username) {
         User userEntity = userRepository.findByUserName(username)
                 .orElseThrow(() -> new HospitalReviewAppException(ErrorCode.USERNAME_NOT_FOUND, String.format("%s not founded", username)));
 
@@ -93,7 +96,20 @@ public class PostService {
         return postRepository.saveAndFlush(post);
     }
 
-    public CommentResponse comment(CommentRequest commentRequest) {
-        return null;
+    public CommentResponse comment(CommentRequest commentRequest, String userName, Integer id) {
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new HospitalReviewAppException(ErrorCode.POST_NOT_FOUND, String.format("postId is %d", id)));
+
+        User user = userRepository.findByUserName(userName)
+                .orElseThrow(() -> new HospitalReviewAppException(ErrorCode.USERNAME_NOT_FOUND, String.format("%s not founded", userName)));
+
+        Comment createdComment = Comment.builder()
+                .comment(commentRequest.getComment())
+                .post(post)
+                .user(user)
+                .build();
+        commentRepository.save(createdComment);
+
+        return Comment.of(createdComment);
     }
 }

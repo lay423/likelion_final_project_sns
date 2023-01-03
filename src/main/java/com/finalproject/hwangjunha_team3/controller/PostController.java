@@ -56,4 +56,10 @@ public class PostController {
         return Response.success(new PostResponse("포스트 수정 완료", postEntity.getId()));
     }
 
+    @PostMapping("/{id}/comments")
+    public Response<CommentResponse> comment(@PathVariable Integer id, @RequestBody CommentRequest commentRequest, Authentication authentication) {
+        log.info("comment:{}, user:{}, id:{}", commentRequest.getComment(), authentication.getName(), id);
+        return Response.success(postService.comment(commentRequest, authentication.getName(), id));
+    }
+
 }
