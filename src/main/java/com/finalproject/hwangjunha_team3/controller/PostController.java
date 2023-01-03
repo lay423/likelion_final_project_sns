@@ -26,10 +26,10 @@ public class PostController {
 
 
     @PostMapping
-    public Response<PostRegisterResponse> post(@RequestBody PostRegisterRequest request, Authentication authentication) {
+    public Response<PostResponse> post(@RequestBody PostRegisterRequest request, Authentication authentication) {
         log.info("username:{}", authentication.getName());
         PostDto postDto = postService.post(request, authentication.getName());
-        return Response.success(new PostRegisterResponse("포스트 등록 완료", postDto.getId()));
+        return Response.success(new PostResponse("포스트 등록 완료", postDto.getId()));
     }
 
     @GetMapping("/{postsId}")
@@ -65,6 +65,12 @@ public class PostController {
     @PutMapping("/{postId}/comments/{commentId}")
     public Response<CommentModifyResponse> modifyComment(@PathVariable Integer postId, @PathVariable Integer commentId, @RequestBody CommentRequest commentRequest, Authentication authentication) {
         return Response.success(postService.modifyComment(postId, commentId, commentRequest, authentication.getName()));
+    }
+
+    @DeleteMapping("/{postId}/comments/{commentId}")
+    public Response<CommentDeleteResponse> deleteComment(@PathVariable Integer postId, @PathVariable Integer commentId, Authentication authentication) {
+        postService.deleteComment(authentication.getName(), postId, commentId);
+        return Response.success(new CommentDeleteResponse("댓글 삭제 완료", commentId));
     }
 
 }
