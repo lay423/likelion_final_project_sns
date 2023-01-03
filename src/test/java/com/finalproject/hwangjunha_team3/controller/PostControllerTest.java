@@ -1,6 +1,5 @@
 package com.finalproject.hwangjunha_team3.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.finalproject.hwangjunha_team3.configuration.EncrypterConfig;
 import com.finalproject.hwangjunha_team3.domain.Post;
@@ -14,18 +13,19 @@ import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.time.LocalDateTime;
-
 import static java.time.LocalDateTime.now;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -35,7 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(PostController.class)
 class PostControllerTest {
-//
+    //
     @Autowired
     MockMvc mockMvc;
 
@@ -122,7 +122,8 @@ class PostControllerTest {
                 .andExpect(jsonPath("$.result.postId").exists())
         ;
     }
-//
+
+    //
     @Test
     @WithAnonymousUser // 인증 된지 않은 상태
     @DisplayName("포스트 작성 실패(1) : 인증 실패")
@@ -333,6 +334,7 @@ class PostControllerTest {
     @WithMockUser
     @DisplayName("댓글 작성 성공")
     void comment_success() throws Exception {
+
         CommentRequest commentRequest = CommentRequest.builder()
                 .comment("comment test")
                 .build();
@@ -359,10 +361,12 @@ class PostControllerTest {
                 .andExpect(jsonPath("$.result.createdAt").exists())
         ;
     }
+
     @Test
     @WithMockUser
     @DisplayName("댓글 작성 실패(1) - 로그인 하지 않은 경우")
     void comment_fail1() throws Exception {
+
         CommentRequest commentRequest = CommentRequest.builder()
                 .comment("comment test")
                 .build();
@@ -383,6 +387,7 @@ class PostControllerTest {
     @WithMockUser
     @DisplayName("댓글 작성 실패(2) - 게시물이 존재하지 않는 경우")
     void comment_fail2() throws Exception {
+
         CommentRequest commentRequest = CommentRequest.builder()
                 .comment("comment test")
                 .build();
@@ -398,4 +403,200 @@ class PostControllerTest {
                 .andExpect(status().is(ErrorCode.POST_NOT_FOUND.getStatus().value()))
         ;
     }
+
+    @Test
+    @WithMockUser
+    @DisplayName("댓글 수정 성공")
+    void comment_modify_success() throws Exception {
+
+        CommentRequest commentRequest = CommentRequest.builder()
+                .comment("comment modify test")
+                .build();
+
+        when(postService.modifyComment(any(), any(), any()))
+                .thenReturn(CommentResponse.builder()
+                        .id(0)
+                        .comment("comment modify test")
+                        .userName("junha")
+                        .postId(0)
+                        .createdAt(now())
+                        .build());
+
+        mockMvc.perform(post("/api/v1//posts/1/comments/1")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsBytes(commentRequest)))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.result.id").exists())
+                .andExpect(jsonPath("$.result.comment").exists())
+                .andExpect(jsonPath("$.result.userName").exists())
+                .andExpect(jsonPath("$.result.postId").exists())
+                .andExpect(jsonPath("$.result.createdAt").exists())
+        ;
+
+    }
+
+    @Test
+    @WithMockUser
+    @DisplayName("댓글 수정 실패(1) : 인증 실패")
+    void comment_modify_fail1() throws Exception {
+
+        CommentRequest commentRequest = CommentRequest.builder()
+                .comment("comment modify test")
+                .build();
+
+        when(postService.modifyComment(any(), any(), any()))
+                .thenThrow(new HospitalReviewAppException(ErrorCode.INVALID_PERMISSION, ""));
+
+        mockMvc.perform(post("/api/v1//posts/1/comments/1")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsBytes(commentRequest)))
+                .andDo(print())
+                .andExpect(status().isUnauthorized())
+        ;
+    }
+
+    @Test
+    @WithMockUser
+    @DisplayName("댓글 수정 실패(2) : 댓글 불일치")
+    void comment_modify_fail2() throws Exception {
+
+        CommentRequest commentRequest = CommentRequest.builder()
+                .comment("comment modify test")
+                .build();
+
+        when(postService.modifyComment(any(), any(), any()))
+                .thenThrow(new HospitalReviewAppException(ErrorCode.COMMENT_NOT_FOUND, ""));
+
+        mockMvc.perform(post("/api/v1//posts/1/comments/1")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsBytes(commentRequest)))
+                .andDo(print())
+                .andExpect(status().is(ErrorCode.COMMENT_NOT_FOUND.getStatus().value()))
+        ;
+    }
+
+    @Test
+    @WithMockUser
+    @DisplayName("댓글 수정 실패(3) : 작성자 불일치")
+    void comment_modify_fail3() throws Exception {
+
+        CommentRequest commentRequest = CommentRequest.builder()
+                .comment("comment modify test")
+                .build();
+
+        when(postService.modifyComment(any(), any(), any()))
+                .thenThrow(new HospitalReviewAppException(ErrorCode.USERNAME_NOT_FOUND, ""));
+
+        mockMvc.perform(post("/api/v1//posts/1/comments/1")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsBytes(commentRequest)))
+                .andDo(print())
+                .andExpect(status().is(ErrorCode.USERNAME_NOT_FOUND.getStatus().value()))
+        ;
+    }
+
+    @Test
+    @WithMockUser
+    @DisplayName("댓글 수정 실패(4) : 데이터베이스 에러")
+    void comment_modify_fail4() throws Exception {
+
+        CommentRequest commentRequest = CommentRequest.builder()
+                .comment("comment modify test")
+                .build();
+
+        when(postService.modifyComment(any(), any(), any()))
+                .thenThrow(new HospitalReviewAppException(ErrorCode.DATABASE_ERROR, ""));
+
+        mockMvc.perform(post("/api/v1//posts/1/comments/1")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsBytes(commentRequest)))
+                .andDo(print())
+                .andExpect(status().is(ErrorCode.DATABASE_ERROR.getStatus().value()))
+        ;
+    }
+
+    @Test
+    @WithMockUser
+    @DisplayName("댓글 삭제 성공")
+    void comment_delete_success() throws Exception {
+
+        mockMvc.perform(post("/api/v1//posts/1/comments/1")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.result.message").exists())
+                .andExpect(jsonPath("$.result.id").exists())
+        ;
+    }
+    @Test
+    @WithMockUser
+    @DisplayName("댓글 삭제 실패(1) : 인증 실패")
+    void comment_delete_fail1() throws Exception {
+
+        when(postService.deleteComment(any(), any()))
+                .thenThrow(new HospitalReviewAppException(ErrorCode.INVALID_PERMISSION, ""));
+
+        mockMvc.perform(post("/api/v1//posts/1/comments/1")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isUnauthorized())
+        ;
+    }
+
+    @Test
+    @WithMockUser
+    @DisplayName("댓글 삭제 실패(2) : 댓글 불일치")
+    void comment_delete_fail2() throws Exception {
+
+        when(postService.deleteComment(any(), any()))
+                .thenThrow(new HospitalReviewAppException(ErrorCode.COMMENT_NOT_FOUND, ""));
+
+        mockMvc.perform(post("/api/v1//posts/1/comments/1")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().is(ErrorCode.COMMENT_NOT_FOUND.getStatus().value()))
+        ;
+    }
+
+    @Test
+    @WithMockUser
+    @DisplayName("댓글 삭제 실패(3) : 작성자 불일치")
+    void comment_delete_fail3() throws Exception {
+
+        when(postService.deleteComment(any(), any()))
+                .thenThrow(new HospitalReviewAppException(ErrorCode.USERNAME_NOT_FOUND, ""));
+
+        mockMvc.perform(post("/api/v1//posts/1/comments/1")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().is(ErrorCode.USERNAME_NOT_FOUND.getStatus().value()))
+        ;
+    }
+
+    @Test
+    @WithMockUser
+    @DisplayName("댓글 삭제 실패(4) : 데이터베이스 에러")
+    void comment_delete_fail4() throws Exception {
+
+        when(postService.deleteComment(any(), any()))
+                .thenThrow(new HospitalReviewAppException(ErrorCode.DATABASE_ERROR, ""));
+
+        mockMvc.perform(post("/api/v1//posts/1/comments/1")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().is(ErrorCode.DATABASE_ERROR.getStatus().value()))
+        ;
+    }
+
 }
