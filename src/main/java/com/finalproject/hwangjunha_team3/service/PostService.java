@@ -112,4 +112,12 @@ public class PostService {
 
         return Comment.of(createdComment);
     }
+
+    public CommentResponse modifyComment(CommentRequest commentRequest, String userName, Integer id) {
+        return null;
+    }
+
+    public CommentDeleteResponse deleteComment(String userName, Integer id) {
+        return null;
+    }
 }
