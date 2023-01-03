@@ -39,7 +39,7 @@ public class PostController {
 
     @GetMapping
     public Response<Page<PostDto>> getPostList(@PageableDefault(size = 20)
-                                               @SortDefault(sort = "createdAt",direction = Sort.Direction.DESC) Pageable pageable) {
+                                               @SortDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         Page<PostDto> postDtos = postService.getAllPosts(pageable);
         return Response.success(postDtos);
     }
@@ -71,6 +71,13 @@ public class PostController {
     public Response<CommentDeleteResponse> deleteComment(@PathVariable Integer postId, @PathVariable Integer commentId, Authentication authentication) {
         postService.deleteComment(authentication.getName(), postId, commentId);
         return Response.success(new CommentDeleteResponse("댓글 삭제 완료", commentId));
+    }
+
+    @GetMapping("/{postId}/coments")
+    public Response<Page<CommentResponse>> getCommentList(@PageableDefault(size = 20)
+                                                          @SortDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
+                                                          @PathVariable Integer postId) {
+        return Response.success(postService.getAllComments(pageable, postId));
     }
 
 }
