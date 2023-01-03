@@ -136,7 +136,26 @@ public class PostService {
         return Comment.ofModify(modifiedComment);
     }
 
-    public CommentDeleteResponse deleteComment(String userName, Integer id) {
-        return null;
+    public boolean deleteComment(String userName, Integer postId, Integer commentId) {
+
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new HospitalReviewAppException(ErrorCode.COMMENT_NOT_FOUND, String.format("commentId %d is not found", commentId)));
+
+        User user = userRepository.findByUserName(userName)
+                .orElseThrow(() -> new HospitalReviewAppException(ErrorCode.USERNAME_NOT_FOUND, String.format("%s not founded", userName)));
+
+        //댓글의 포스트ID가 파라미터와 일치한지 검증
+        if (comment.getPost().getId() != postId) {
+            throw new HospitalReviewAppException(ErrorCode.INVALID_PERMISSION, String.format("postId %d is not match with %d", comment.getPost().getId(), postId));
+        }
+
+        //댓글의 userName과 Token의 userName이 일치한지 검증
+        if (!Objects.equals(comment.getUser().getId(), user.getId())) {
+            throw new HospitalReviewAppException(ErrorCode.INVALID_PERMISSION, String.format("user %s has no permission with comment %d", userName, commentId));
+        }
+
+        commentRepository.delete(comment);
+
+        return true;
     }
 }

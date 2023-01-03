@@ -523,82 +523,82 @@ class PostControllerTest {
         ;
     }
 
-//    @Test
-//    @WithMockUser
-//    @DisplayName("댓글 삭제 성공")
-//    void comment_delete_success() throws Exception {
-//
-//        mockMvc.perform(delete("/api/v1//posts/1/comments/1")
-//                        .with(csrf())
-//                        .contentType(MediaType.APPLICATION_JSON))
-//                .andDo(print())
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("$.result.message").exists())
-//                .andExpect(jsonPath("$.result.id").exists())
-//        ;
-//    }
-//    @Test
-//    @WithMockUser
-//    @DisplayName("댓글 삭제 실패(1) : 인증 실패")
-//    void comment_delete_fail1() throws Exception {
-//
-//        when(postService.deleteComment(any(), any()))
-//                .thenThrow(new HospitalReviewAppException(ErrorCode.INVALID_PERMISSION, ""));
-//
-//        mockMvc.perform(delete("/api/v1//posts/1/comments/1")
-//                        .with(csrf())
-//                        .contentType(MediaType.APPLICATION_JSON))
-//                .andDo(print())
-//                .andExpect(status().isUnauthorized())
-//        ;
-//    }
-//
-//    @Test
-//    @WithMockUser
-//    @DisplayName("댓글 삭제 실패(2) : 댓글 불일치")
-//    void comment_delete_fail2() throws Exception {
-//
-//        when(postService.deleteComment(any(), any()))
-//                .thenThrow(new HospitalReviewAppException(ErrorCode.COMMENT_NOT_FOUND, ""));
-//
-//        mockMvc.perform(delete("/api/v1//posts/1/comments/1")
-//                        .with(csrf())
-//                        .contentType(MediaType.APPLICATION_JSON))
-//                .andDo(print())
-//                .andExpect(status().is(ErrorCode.COMMENT_NOT_FOUND.getStatus().value()))
-//        ;
-//    }
-//
-//    @Test
-//    @WithMockUser
-//    @DisplayName("댓글 삭제 실패(3) : 작성자 불일치")
-//    void comment_delete_fail3() throws Exception {
-//
-//        when(postService.deleteComment(any(), any()))
-//                .thenThrow(new HospitalReviewAppException(ErrorCode.USERNAME_NOT_FOUND, ""));
-//
-//        mockMvc.perform(delete("/api/v1//posts/1/comments/1")
-//                        .with(csrf())
-//                        .contentType(MediaType.APPLICATION_JSON))
-//                .andDo(print())
-//                .andExpect(status().is(ErrorCode.USERNAME_NOT_FOUND.getStatus().value()))
-//        ;
-//    }
-//
-//    @Test
-//    @WithMockUser
-//    @DisplayName("댓글 삭제 실패(4) : 데이터베이스 에러")
-//    void comment_delete_fail4() throws Exception {
-//
-//        when(postService.deleteComment(any(), any()))
-//                .thenThrow(new HospitalReviewAppException(ErrorCode.DATABASE_ERROR, ""));
-//
-//        mockMvc.perform(delete("/api/v1//posts/1/comments/1")
-//                        .with(csrf())
-//                        .contentType(MediaType.APPLICATION_JSON))
-//                .andDo(print())
-//                .andExpect(status().is(ErrorCode.DATABASE_ERROR.getStatus().value()))
-//        ;
-//    }
+    @Test
+    @WithMockUser
+    @DisplayName("댓글 삭제 성공")
+    void comment_delete_success() throws Exception {
+
+        mockMvc.perform(delete("/api/v1//posts/1/comments/1")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.result.message").exists())
+                .andExpect(jsonPath("$.result.id").exists())
+        ;
+    }
+    @Test
+    @WithMockUser
+    @DisplayName("댓글 삭제 실패(1) : 인증 실패")
+    void comment_delete_fail1() throws Exception {
+
+        when(postService.deleteComment(any(), any(), any()))
+                .thenThrow(new HospitalReviewAppException(ErrorCode.INVALID_PERMISSION, ""));
+
+        mockMvc.perform(delete("/api/v1//posts/1/comments/1")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isUnauthorized())
+        ;
+    }
+
+    @Test
+    @WithMockUser
+    @DisplayName("댓글 삭제 실패(2) : 댓글 불일치")
+    void comment_delete_fail2() throws Exception {
+
+        when(postService.deleteComment(any(), any(), any()))
+                .thenThrow(new HospitalReviewAppException(ErrorCode.COMMENT_NOT_FOUND, ""));
+
+        mockMvc.perform(delete("/api/v1//posts/1/comments/1")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().is(ErrorCode.COMMENT_NOT_FOUND.getStatus().value()))
+        ;
+    }
+
+    @Test
+    @WithMockUser
+    @DisplayName("댓글 삭제 실패(3) : 작성자 불일치")
+    void comment_delete_fail3() throws Exception {
+
+        when(postService.deleteComment(any(), any(), any()))
+                .thenThrow(new HospitalReviewAppException(ErrorCode.USERNAME_NOT_FOUND, ""));
+
+        mockMvc.perform(delete("/api/v1//posts/1/comments/1")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().is(ErrorCode.USERNAME_NOT_FOUND.getStatus().value()))
+        ;
+    }
+
+    @Test
+    @WithMockUser
+    @DisplayName("댓글 삭제 실패(4) : 데이터베이스 에러")
+    void comment_delete_fail4() throws Exception {
+
+        when(postService.deleteComment(any(), any(), any()))
+                .thenThrow(new HospitalReviewAppException(ErrorCode.DATABASE_ERROR, ""));
+
+        mockMvc.perform(delete("/api/v1//posts/1/comments/1")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().is(ErrorCode.DATABASE_ERROR.getStatus().value()))
+        ;
+    }
 
 }
