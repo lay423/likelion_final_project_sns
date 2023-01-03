@@ -1,5 +1,6 @@
 package com.finalproject.hwangjunha_team3.domain;
 
+import com.finalproject.hwangjunha_team3.domain.dto.CommentModifyResponse;
 import com.finalproject.hwangjunha_team3.domain.dto.CommentResponse;
 import lombok.*;
 import springfox.documentation.spring.web.json.Json;
@@ -10,6 +11,7 @@ import javax.persistence.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
+@Setter
 @Builder
 public class Comment extends BaseEntity{
     @Id
@@ -33,6 +35,17 @@ public class Comment extends BaseEntity{
                 .userName(comment.getUser().getUserName())
                 .postId(comment.getPost().getId())
                 .createdAt(comment.getCreatedAt())
+                .build();
+    }
+
+    public static CommentModifyResponse ofModify(Comment comment) {
+        return CommentModifyResponse.builder()
+                .id(comment.getId())
+                .comment(comment.getComment())
+                .userName(comment.getUser().getUserName())
+                .postId(comment.getPost().getId())
+                .createdAt(comment.getCreatedAt())
+                .lastModifiedAt(comment.getLastModifiedAt())
                 .build();
     }
 }
