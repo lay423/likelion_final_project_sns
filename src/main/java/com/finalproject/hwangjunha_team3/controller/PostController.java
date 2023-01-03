@@ -62,4 +62,9 @@ public class PostController {
         return Response.success(postService.comment(commentRequest, authentication.getName(), id));
     }
 
+    @PutMapping("/{postId}/comments/{commentId}")
+    public Response<CommentModifyResponse> modifyComment(@PathVariable Integer postId, @PathVariable Integer commentId, @RequestBody CommentRequest commentRequest, Authentication authentication) {
+        return Response.success(postService.modifyComment(postId, commentId, commentRequest, authentication.getName()));
+    }
+
 }
