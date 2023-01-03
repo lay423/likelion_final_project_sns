@@ -158,4 +158,10 @@ public class PostService {
 
         return true;
     }
+
+    public Page<CommentResponse> getAllComments(Pageable pageable, Integer postId) {
+        Page<Comment> comments = commentRepository.findAllByPostId(postId, pageable);
+        Page<CommentResponse> commentResponses = CommentResponse.toDtoList(comments);
+        return commentResponses;
+    }
 }
