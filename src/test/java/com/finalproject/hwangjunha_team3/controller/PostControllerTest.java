@@ -1,11 +1,10 @@
 package com.finalproject.hwangjunha_team3.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.finalproject.hwangjunha_team3.configuration.EncrypterConfig;
 import com.finalproject.hwangjunha_team3.domain.Post;
-import com.finalproject.hwangjunha_team3.domain.dto.ModifyRequest;
-import com.finalproject.hwangjunha_team3.domain.dto.PostDto;
-import com.finalproject.hwangjunha_team3.domain.dto.PostRegisterRequest;
+import com.finalproject.hwangjunha_team3.domain.dto.*;
 import com.finalproject.hwangjunha_team3.exceptionManager.ErrorCode;
 import com.finalproject.hwangjunha_team3.exceptionManager.HospitalReviewAppException;
 import com.finalproject.hwangjunha_team3.service.PostService;
@@ -329,4 +328,69 @@ class PostControllerTest {
                 .andExpect(status().is(ErrorCode.DATABASE_ERROR.getStatus().value()));
     }
 
+    @Test
+    @WithMockUser
+    @DisplayName("댓글 작성 성공")
+    void comment_success() throws Exception {
+        CommentRequest commentRequest = CommentRequest.builder()
+                .comment("comment test")
+                .build();
+
+        when(postService.comment(any()))
+                .thenReturn(CommentResponse.builder()
+                        .id(0)
+                        .build());
+
+        mockMvc.perform(post("/api/v1/posts/1/comments")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsBytes(commentRequest)))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.result.id").exists())
+                .andExpect(jsonPath("$.result.comment").exists())
+                .andExpect(jsonPath("$.result.userName").exists())
+                .andExpect(jsonPath("$.result.postId").exists())
+                .andExpect(jsonPath("$.result.createdAt").exists())
+        ;
+    }
+    @Test
+    @WithMockUser
+    @DisplayName("댓글 작성 실패(1) - 로그인 하지 않은 경우")
+    void comment_fail1() throws Exception {
+        CommentRequest commentRequest = CommentRequest.builder()
+                .comment("comment test")
+                .build();
+
+        when(postService.comment(any()))
+                .thenThrow(new HospitalReviewAppException(ErrorCode.INVALID_PERMISSION, ""));
+
+        mockMvc.perform(post("/api/v1/posts/1/comments")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsBytes(commentRequest)))
+                .andDo(print())
+                .andExpect(status().isUnauthorized())
+        ;
+    }
+
+    @Test
+    @WithMockUser
+    @DisplayName("댓글 작성 실패(2) - 게시물이 존재하지 않는 경우")
+    void comment_fail2() throws Exception {
+        CommentRequest commentRequest = CommentRequest.builder()
+                .comment("comment test")
+                .build();
+
+        when(postService.comment(any()))
+                .thenThrow(new HospitalReviewAppException(ErrorCode.POST_NOT_FOUND, ""));
+
+        mockMvc.perform(post("/api/v1/posts/1/comments")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsBytes(commentRequest)))
+                .andDo(print())
+                .andExpect(status().is(ErrorCode.POST_NOT_FOUND.getStatus().value()))
+        ;
+    }
 }

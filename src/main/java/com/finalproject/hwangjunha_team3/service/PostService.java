@@ -2,8 +2,7 @@ package com.finalproject.hwangjunha_team3.service;
 
 import com.finalproject.hwangjunha_team3.domain.Post;
 import com.finalproject.hwangjunha_team3.domain.User;
-import com.finalproject.hwangjunha_team3.domain.dto.PostDto;
-import com.finalproject.hwangjunha_team3.domain.dto.PostRegisterRequest;
+import com.finalproject.hwangjunha_team3.domain.dto.*;
 import com.finalproject.hwangjunha_team3.exceptionManager.ErrorCode;
 import com.finalproject.hwangjunha_team3.exceptionManager.HospitalReviewAppException;
 import com.finalproject.hwangjunha_team3.repository.PostRepository;
@@ -92,5 +91,9 @@ public class PostService {
         post.setTitle(title);
         post.setBody(body);
         return postRepository.saveAndFlush(post);
+    }
+
+    public CommentResponse comment(CommentRequest commentRequest) {
+        return null;
     }
 }
