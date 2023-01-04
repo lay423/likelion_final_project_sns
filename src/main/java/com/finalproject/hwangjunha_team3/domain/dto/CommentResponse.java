@@ -19,8 +19,12 @@ public class CommentResponse {
     private String comment;
     private String userName;
     private Integer postId;
+
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private LocalDateTime createdAt;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
+    private LocalDateTime lastModifiedAt;
 
     public static Page<CommentResponse> toDtoList(Page<Comment> comments) {
         return comments.map(m -> CommentResponse.builder()
