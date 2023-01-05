@@ -1,12 +1,14 @@
 package com.finalproject.hwangjunha_team3.service;
 
 import com.finalproject.hwangjunha_team3.domain.Comment;
+import com.finalproject.hwangjunha_team3.domain.Like;
 import com.finalproject.hwangjunha_team3.domain.Post;
 import com.finalproject.hwangjunha_team3.domain.User;
 import com.finalproject.hwangjunha_team3.domain.dto.*;
 import com.finalproject.hwangjunha_team3.exceptionManager.ErrorCode;
 import com.finalproject.hwangjunha_team3.exceptionManager.HospitalReviewAppException;
 import com.finalproject.hwangjunha_team3.repository.CommentRepository;
+import com.finalproject.hwangjunha_team3.repository.LikeRepository;
 import com.finalproject.hwangjunha_team3.repository.PostRepository;
 import com.finalproject.hwangjunha_team3.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.Objects;
+import java.util.Optional;
 
 
 @Service
@@ -27,6 +30,7 @@ public class PostService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final CommentRepository commentRepository;
+    private final LikeRepository likeRepository;
 
     @Value("${jwt.token.secret}")
     private String secretKey;
@@ -163,5 +167,35 @@ public class PostService {
         Page<Comment> comments = commentRepository.findAllByPostId(postId, pageable);
         Page<CommentResponse> commentResponses = CommentResponse.toDtoList(comments);
         return commentResponses;
+    }
+
+    public boolean like(Integer postId, String userName) {
+
+        Post findPost = postRepository.findById(postId)
+                .orElseThrow(() -> new HospitalReviewAppException(ErrorCode.POST_NOT_FOUND, String.format("postId is %d", postId)));
+
+        User findUser = userRepository.findByUserName(userName)
+                .orElseThrow(() -> new HospitalReviewAppException(ErrorCode.USERNAME_NOT_FOUND, String.format("%s not founded", userName)));
+
+        Optional<Like> likeOptional = likeRepository.findByPostIdAndUserId(findPost.getId(), findUser.getId());
+
+        if (likeOptional.isPresent()) {
+            throw new HospitalReviewAppException(ErrorCode.ALREADY_LIKED, "");
+        } else {
+            Like like = Like.builder()
+                    .user(findUser)
+                    .post(findPost)
+                    .build();
+            likeRepository.save(like);
+        }
+        return true;
+    }
+
+    public Integer getLikeCnt(Integer postId) {
+
+        Post findPost = postRepository.findById(postId)
+                .orElseThrow(() -> new HospitalReviewAppException(ErrorCode.POST_NOT_FOUND, String.format("postId is %d", postId)));
+
+        return likeRepository.countAllByPost(findPost);
     }
 }

@@ -601,4 +601,46 @@ class PostControllerTest {
         ;
     }
 
+    @Test
+    @WithMockUser
+    @DisplayName("좋아요 누르기 성공")
+    void like_success() throws Exception {
+
+        mockMvc.perform(post("/api/v1/posts/1/likes")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser
+    @DisplayName("좋아요 누르기 실패(1) - 로그인 하지 않은 경우")
+    void like_fail1() throws Exception {
+
+        when(postService.like(any(), any()))
+                .thenThrow(new HospitalReviewAppException(ErrorCode.INVALID_PERMISSION, ""));
+
+        mockMvc.perform(post("/api/v1/posts/1/likes")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @WithMockUser
+    @DisplayName("좋아요 누르기 실패(2) - 해당 Post가 없는 경우")
+    void like_fail2() throws Exception {
+
+        when(postService.like(any(), any()))
+                .thenThrow(new HospitalReviewAppException(ErrorCode.POST_NOT_FOUND, ""));
+
+        mockMvc.perform(post("/api/v1/posts/1/likes")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().is(ErrorCode.POST_NOT_FOUND.getStatus().value()));
+
+    }
 }
