@@ -85,4 +85,9 @@ public class PostController {
         postService.like(postId, authentication.getName());
         return Response.success("좋아요를 눌렀습니다.");
     }
+
+    @GetMapping("/{postId}/likes")
+    public Response<Integer> getLikeCnt(@PathVariable Integer postId) {
+        return Response.success(postService.getLikeCnt(postId));
+    }
 }

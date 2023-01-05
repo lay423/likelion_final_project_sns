@@ -190,4 +190,12 @@ public class PostService {
         }
         return true;
     }
+
+    public Integer getLikeCnt(Integer postId) {
+
+        Post findPost = postRepository.findById(postId)
+                .orElseThrow(() -> new HospitalReviewAppException(ErrorCode.POST_NOT_FOUND, String.format("postId is %d", postId)));
+
+        return likeRepository.countAllByPost(findPost);
+    }
 }
