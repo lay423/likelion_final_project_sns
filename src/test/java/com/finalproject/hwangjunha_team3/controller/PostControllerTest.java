@@ -13,6 +13,7 @@ import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -643,4 +644,38 @@ class PostControllerTest {
                 .andExpect(status().is(ErrorCode.POST_NOT_FOUND.getStatus().value()));
 
     }
+
+    @Test
+    @WithMockUser
+    @DisplayName("마이피드 조회 성공")
+    void myFeed_success() throws Exception {
+
+        when(postService.myFeed(any(), any()))
+                .thenReturn(Page.empty());
+
+        mockMvc.perform(get("/api/v1/posts/my")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+        ;
+    }
+
+    @Test
+    @WithMockUser
+    @DisplayName("마이피드 조회 실패(1) - 로그인 하지 않은 경우")
+    void myFeed_fail1() throws Exception {
+
+        when(postService.myFeed(any(), any()))
+                .thenThrow(new HospitalReviewAppException(ErrorCode.INVALID_PERMISSION, ""));
+
+        mockMvc.perform(get("/api/v1/posts/my")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isUnauthorized())
+        ;
+    }
+
+
 }

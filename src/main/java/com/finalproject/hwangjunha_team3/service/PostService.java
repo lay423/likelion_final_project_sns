@@ -198,4 +198,15 @@ public class PostService {
 
         return likeRepository.countAllByPost(findPost);
     }
+
+    public Page<PostDto> myFeed(Pageable pageable, String userName) {
+
+        User user = userRepository.findByUserName(userName)
+                .orElseThrow(() -> new HospitalReviewAppException(ErrorCode.USERNAME_NOT_FOUND, String.format("%s not founded", userName)));
+
+        Page<Post> posts = postRepository.findAllByUserId(user.getId(), pageable);
+        Page<PostDto> postDtos = PostDto.toDtoList(posts);
+
+        return postDtos;
+    }
 }
