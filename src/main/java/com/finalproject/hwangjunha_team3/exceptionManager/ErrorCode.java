@@ -17,7 +17,9 @@ public enum ErrorCode {
     INVALID_PASSWORD(HttpStatus.UNAUTHORIZED, "Invalid password"),
     INVALID_PERMISSION(HttpStatus.UNAUTHORIZED, "User has invalid permission"),
 
-    DATABASE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Database error occurs");
+    DATABASE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Database error occurs"),
+    ALREADY_LIKED(HttpStatus.CONFLICT, "Already liked the post")
+    ;
 
 
     private HttpStatus status;
