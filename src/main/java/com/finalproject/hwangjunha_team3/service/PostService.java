@@ -209,4 +209,9 @@ public class PostService {
 
         return postDtos;
     }
+
+    public Page<PostDto> getAlarm(String userName) {
+        return null;
+    }
+
 }
