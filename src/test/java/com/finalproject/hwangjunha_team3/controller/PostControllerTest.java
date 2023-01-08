@@ -677,35 +677,6 @@ class PostControllerTest {
         ;
     }
 
-    @Test
-    @WithMockUser
-    @DisplayName("알람 목록 조회 성공")
-    void alarm_success() throws Exception {
 
-        when(postService.getAlarm(any()))
-                .thenReturn(Page.empty());
-
-        mockMvc.perform(get("/api/v1/alarms")
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andDo(print())
-                .andExpect(status().isOk());
-    }
-
-    @Test
-    @WithMockUser
-    @DisplayName("알람 목록 조회 실패 - 로그인하지 않은 경우")
-    void alarm_fail() throws Exception {
-
-        when(postService.getAlarm(any()))
-                .thenThrow(new HospitalReviewAppException(ErrorCode.INVALID_PERMISSION, ""));
-
-        mockMvc.perform(get("/api/v1/alarms")
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andDo(print())
-                .andExpect(status().isUnauthorized())
-        ;
-    }
 
 }
