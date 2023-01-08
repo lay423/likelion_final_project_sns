@@ -1,16 +1,10 @@
 package com.finalproject.hwangjunha_team3.service;
 
-import com.finalproject.hwangjunha_team3.domain.Comment;
-import com.finalproject.hwangjunha_team3.domain.Like;
-import com.finalproject.hwangjunha_team3.domain.Post;
-import com.finalproject.hwangjunha_team3.domain.User;
+import com.finalproject.hwangjunha_team3.domain.*;
 import com.finalproject.hwangjunha_team3.domain.dto.*;
 import com.finalproject.hwangjunha_team3.exceptionManager.ErrorCode;
 import com.finalproject.hwangjunha_team3.exceptionManager.HospitalReviewAppException;
-import com.finalproject.hwangjunha_team3.repository.CommentRepository;
-import com.finalproject.hwangjunha_team3.repository.LikeRepository;
-import com.finalproject.hwangjunha_team3.repository.PostRepository;
-import com.finalproject.hwangjunha_team3.repository.UserRepository;
+import com.finalproject.hwangjunha_team3.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,6 +25,7 @@ public class PostService {
     private final UserRepository userRepository;
     private final CommentRepository commentRepository;
     private final LikeRepository likeRepository;
+    private final AlarmRepository alarmRepository;
 
     @Value("${jwt.token.secret}")
     private String secretKey;
@@ -114,6 +109,15 @@ public class PostService {
                 .build();
         commentRepository.save(createdComment);
 
+        Alarm alarm = Alarm.builder()
+                .alarmType("NEW_COMMENT_ON_POST")
+                .fromUserId(user.getId())
+                .targetId(post.getId())
+                .text("new comment!")
+                .user(post.getUser())
+                .build();
+        alarmRepository.save(alarm);
+
         return Comment.of(createdComment);
     }
 
@@ -188,6 +192,16 @@ public class PostService {
                     .build();
             likeRepository.save(like);
         }
+
+        Alarm alarm = Alarm.builder()
+                .alarmType("NEW_LIKE_ON_POST")
+                .fromUserId(findUser.getId())
+                .targetId(findPost.getId())
+                .text("new like!")
+                .user(findPost.getUser())
+                .build();
+        alarmRepository.save(alarm);
+
         return true;
     }
 
@@ -209,4 +223,15 @@ public class PostService {
 
         return postDtos;
     }
+
+    public Page<AlarmResponse> getAlarm(Pageable pageable, String userName) {
+        User user = userRepository.findByUserName(userName)
+                .orElseThrow(() -> new HospitalReviewAppException(ErrorCode.USERNAME_NOT_FOUND, String.format("%s not founded", userName)));
+
+        Page<Alarm> alarms = alarmRepository.findAllByUserId(user.getId(), pageable);
+        Page<AlarmResponse> alarmResponses = AlarmResponse.toDtoList(alarms);
+
+        return alarmResponses;
+    }
+
 }
