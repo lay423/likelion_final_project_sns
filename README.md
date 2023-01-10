@@ -1,19 +1,22 @@
 # FinalProject_HwangJunha_team3
-## 멋쟁이사자처럼 첫번째 미션
+## 멋쟁이사자처럼 개인 프로젝트
 
-### 필수 과제
+### EndPoints
+#### swagger
+http://ec2-13-209-89-109.ap-northeast-2.compute.amazonaws.com:8080/swagger-ui/
+<br>
+
+### 첫번째 미션 필수 과제
 - 회원가입
 - Swagger
 - AWS EC2에 Docker 배포
 - Gitlab CI & Crontab CD
 - 로그인
 - 포스트 작성, 수정, 삭제, 리스트
-### EndPoints
-#### swagger
-http://ec2-13-209-89-109.ap-northeast-2.compute.amazonaws.com:8080/swagger-ui/
-<br>
+
 <br>
 #### user-controller
+<br>
 POST ​/api​/v1​/users​/join
 회원가입
 
@@ -52,3 +55,38 @@ GET ​/api​/v1​/posts​/{postsId}
 ### 특이사항
 #### 아쉬웠던 점
 - 포스트 상세기능을 만들 때, 요구사항을 처음에 숙지하지 못하고 개발을 하여 수정하는 데에 골머리를 싸야 했습니다. 다음 번 프로젝트에는 요구사항을 잘 숙지하고 개발을 시작해야겠다는 점을 배웠습니다.
+
+
+### 두번째 미션 필수과제
+- 댓글
+- 좋아요
+- 마이피드
+- 알림
+- Swagger에 ApiOperation을 써서 Controller 설명 보이게 할 것
+
+#### post-controller
+GET /posts/{postId}/comments[?page=0]
+댓글 조회
+
+POST /posts/{postsId}/comments
+댓글 작성
+
+PUT /posts/{postId}/comments/{id}
+댓글 수정
+
+DELETE /posts/{postsId}/comments/{id}
+댓글 삭제
+
+POST /posts/{postId}/likes
+좋아요 누르기
+
+GET /posts/{postsId}/likes
+좋아요 개수
+
+GET /posts/my
+마이피드 조회 기능
+
+#### alarm-controller
+
+GET /alarms
+특정 사용자의 글에 대한 알림 조회
