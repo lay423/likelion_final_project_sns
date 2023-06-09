@@ -1,9 +1,7 @@
 # FinalProject_HwangJunha_team3
 ## 멋쟁이사자처럼 개인 프로젝트
 
-### EndPoints
-#### swagger
-http://ec2-13-209-89-109.ap-northeast-2.compute.amazonaws.com:8080/swagger-ui/
+
 <br>
 
 ### 첫번째 미션 필수 과제
